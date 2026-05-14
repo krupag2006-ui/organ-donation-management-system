@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const hospitalRoutes = require('./routes/hospitalRoutes');
+const transplantRequestRoutes = require('./routes/transplantRequestRoutes');
 const { notFound, errorHandler } = require('./utils/errorHandler');
 
 // Load environment variables from .env file
@@ -18,6 +19,7 @@ app.use(cors());
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/hospitals', hospitalRoutes);
+app.use('/api/transplant-requests', transplantRequestRoutes);
 
 // Handle invalid routes
 app.use(notFound);
