@@ -75,7 +75,7 @@ const createTransplantRequest = async (req, res) => {
     }
 
     const transplantRequest = await TransplantRequest.create(req.body);
-    const populatedRequest = await transplantRequest
+    const populatedRequest = await TransplantRequest.findById(transplantRequest._id)
       .populate('donor')
       .populate('recipient')
       .populate('hospital');
@@ -181,22 +181,24 @@ const updateTransplantRequest = async (req, res) => {
       }
     });
 
-    const transplantRequest = await TransplantRequest.findByIdAndUpdate(id, updates, {
+    const updatedRequest = await TransplantRequest.findByIdAndUpdate(id, updates, {
       new: true,
       runValidators: true,
-    })
+    });
+
+    if (!updatedRequest) {
+      return res.status(404).json({ success: false, message: 'Transplant request not found' });
+    }
+
+    const populatedRequest = await TransplantRequest.findById(updatedRequest._id)
       .populate('donor')
       .populate('recipient')
       .populate('hospital');
 
-    if (!transplantRequest) {
-      return res.status(404).json({ success: false, message: 'Transplant request not found' });
-    }
-
     return res.status(200).json({
       success: true,
       message: 'Transplant request updated successfully',
-      data: transplantRequest,
+      data: populatedRequest,
     });
   } catch (error) {
     return res.status(400).json({ success: false, message: error.message });
