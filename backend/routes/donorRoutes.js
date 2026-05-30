@@ -1,4 +1,6 @@
 const express = require('express');
+const protect = require('../middleware/authMiddleware');
+const { authorize } = require('../middleware/authMiddleware');
 const {
   createDonor,
   getAllDonors,
@@ -9,9 +11,14 @@ const {
 
 const router = express.Router();
 
-// Donor CRUD routes
-// Auth protection can be added later if required
-router.route('/').post(createDonor).get(getAllDonors);
-router.route('/:id').get(getDonorById).put(updateDonor).delete(deleteDonor);
+router
+  .route('/')
+  .post(protect, authorize('admin', 'hospital'), createDonor)
+  .get(protect, authorize('admin', 'hospital', 'recipient'), getAllDonors);
+router
+  .route('/:id')
+  .get(protect, authorize('admin', 'hospital', 'recipient'), getDonorById)
+  .put(protect, authorize('admin', 'hospital'), updateDonor)
+  .delete(protect, authorize('admin'), deleteDonor);
 
 module.exports = router;

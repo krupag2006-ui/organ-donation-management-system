@@ -74,7 +74,10 @@ const createTransplantRequest = async (req, res) => {
       });
     }
 
-    const transplantRequest = await TransplantRequest.create(req.body);
+    const transplantRequest = await TransplantRequest.create({
+      ...req.body,
+      createdBy: req.user?._id,
+    });
     const populatedRequest = await TransplantRequest.findById(transplantRequest._id)
       .populate('donor')
       .populate('recipient')
@@ -121,11 +124,19 @@ const getAllTransplantRequests = async (req, res) => {
     if (priority) filter.priority = priority;
     if (status) filter.status = status;
 
-    const transplantRequests = await TransplantRequest.find(filter)
+    let transplantRequests = await TransplantRequest.find(filter)
       .sort({ createdAt: -1 })
       .populate('donor')
       .populate('recipient')
       .populate('hospital');
+
+    if (req.user?.role === 'donor') {
+      transplantRequests = transplantRequests.filter((request) => request.donor?.email === req.user.email);
+    }
+
+    if (req.user?.role === 'recipient') {
+      transplantRequests = transplantRequests.filter((request) => request.recipient?.email === req.user.email);
+    }
 
     return res.status(200).json({
       success: true,
@@ -154,6 +165,14 @@ const getTransplantRequestById = async (req, res) => {
 
     if (!transplantRequest) {
       return res.status(404).json({ success: false, message: 'Transplant request not found' });
+    }
+
+    if (req.user?.role === 'donor' && transplantRequest.donor?.email !== req.user.email) {
+      return res.status(403).json({ success: false, message: 'Access denied for this request' });
+    }
+
+    if (req.user?.role === 'recipient' && transplantRequest.recipient?.email !== req.user.email) {
+      return res.status(403).json({ success: false, message: 'Access denied for this request' });
     }
 
     return res.status(200).json({ success: true, data: transplantRequest });

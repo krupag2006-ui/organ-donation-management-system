@@ -25,6 +25,42 @@ const userSchema = new mongoose.Schema(
       default: 'donor',
       required: [true, 'Role is required'],
     },
+    phone: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    city: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    bloodGroup: {
+      type: String,
+      default: '',
+    },
+    organ: {
+      type: String,
+      default: '',
+    },
+    requiredOrgan: {
+      type: String,
+      default: '',
+    },
+    urgency: {
+      type: String,
+      default: 'Medium',
+    },
+    hospitalName: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    licenseId: {
+      type: String,
+      trim: true,
+      default: '',
+    },
   },
   {
     timestamps: true,

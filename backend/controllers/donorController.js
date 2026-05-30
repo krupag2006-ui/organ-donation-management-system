@@ -6,7 +6,10 @@ const mongoose = require('mongoose');
 // @access  Public
 const createDonor = async (req, res) => {
   try {
-    const donor = await Donor.create(req.body);
+    const donor = await Donor.create({
+      ...req.body,
+      registeredBy: req.user?._id,
+    });
     res.status(201).json({
       success: true,
       message: 'Donor created successfully',

@@ -1,4 +1,6 @@
 const express = require('express');
+const protect = require('../middleware/authMiddleware');
+const { authorize } = require('../middleware/authMiddleware');
 const {
   createTransplantRequest,
   getAllTransplantRequests,
@@ -10,10 +12,15 @@ const {
 
 const router = express.Router();
 
-// Transplant request CRUD routes
-// Auth protection can be added later if required
-router.route('/').post(createTransplantRequest).get(getAllTransplantRequests);
-router.route('/:id').get(getTransplantRequestById).put(updateTransplantRequest).delete(deleteTransplantRequest);
-router.patch('/:id/status', updateTransplantRequestStatus);
+router
+  .route('/')
+  .post(protect, authorize('admin', 'hospital'), createTransplantRequest)
+  .get(protect, authorize('admin', 'hospital', 'donor', 'recipient'), getAllTransplantRequests);
+router
+  .route('/:id')
+  .get(protect, authorize('admin', 'hospital', 'donor', 'recipient'), getTransplantRequestById)
+  .put(protect, authorize('admin', 'hospital'), updateTransplantRequest)
+  .delete(protect, authorize('admin'), deleteTransplantRequest);
+router.patch('/:id/status', protect, authorize('admin', 'hospital'), updateTransplantRequestStatus);
 
 module.exports = router;

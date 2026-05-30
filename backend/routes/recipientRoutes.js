@@ -1,4 +1,6 @@
 const express = require('express');
+const protect = require('../middleware/authMiddleware');
+const { authorize } = require('../middleware/authMiddleware');
 const {
   createRecipient,
   getAllRecipients,
@@ -9,9 +11,14 @@ const {
 
 const router = express.Router();
 
-// Recipient CRUD routes
-// Auth protection can be added later if required
-router.route('/').post(createRecipient).get(getAllRecipients);
-router.route('/:id').get(getRecipientById).put(updateRecipient).delete(deleteRecipient);
+router
+  .route('/')
+  .post(protect, authorize('admin', 'hospital'), createRecipient)
+  .get(protect, authorize('admin', 'hospital'), getAllRecipients);
+router
+  .route('/:id')
+  .get(protect, authorize('admin', 'hospital'), getRecipientById)
+  .put(protect, authorize('admin', 'hospital'), updateRecipient)
+  .delete(protect, authorize('admin'), deleteRecipient);
 
 module.exports = router;

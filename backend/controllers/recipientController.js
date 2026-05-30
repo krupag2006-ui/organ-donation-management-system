@@ -19,7 +19,10 @@ const createRecipient = async (req, res) => {
       });
     }
 
-    const recipient = await Recipient.create(req.body);
+    const recipient = await Recipient.create({
+      ...req.body,
+      registeredBy: req.user?._id,
+    });
     return res.status(201).json({
       success: true,
       message: 'Recipient created successfully',

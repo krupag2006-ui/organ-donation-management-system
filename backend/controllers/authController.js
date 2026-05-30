@@ -101,8 +101,62 @@ const getProfile = async (req, res, next) => {
         name: req.user.name,
         email: req.user.email,
         role: req.user.role,
+        phone: req.user.phone,
+        city: req.user.city,
+        bloodGroup: req.user.bloodGroup,
+        organ: req.user.organ,
+        requiredOrgan: req.user.requiredOrgan,
+        urgency: req.user.urgency,
+        hospitalName: req.user.hospitalName,
+        licenseId: req.user.licenseId,
         createdAt: req.user.createdAt,
         updatedAt: req.user.updatedAt,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update current authenticated user profile
+// @route   PUT /api/auth/profile
+// @access  Private
+const updateProfile = async (req, res, next) => {
+  try {
+    const allowedFields = [
+      'name',
+      'phone',
+      'city',
+      'bloodGroup',
+      'organ',
+      'requiredOrgan',
+      'urgency',
+      'hospitalName',
+      'licenseId',
+    ];
+
+    allowedFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        req.user[field] = req.body[field];
+      }
+    });
+
+    const updatedUser = await req.user.save();
+
+    return res.status(200).json({
+      user: {
+        id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        phone: updatedUser.phone,
+        city: updatedUser.city,
+        bloodGroup: updatedUser.bloodGroup,
+        organ: updatedUser.organ,
+        requiredOrgan: updatedUser.requiredOrgan,
+        urgency: updatedUser.urgency,
+        hospitalName: updatedUser.hospitalName,
+        licenseId: updatedUser.licenseId,
       },
     });
   } catch (error) {
@@ -114,4 +168,5 @@ module.exports = {
   registerUser,
   loginUser,
   getProfile,
+  updateProfile,
 };
